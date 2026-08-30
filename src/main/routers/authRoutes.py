@@ -1,20 +1,12 @@
-from fastapi import APIRouter
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.main.server.database import getSession
+from src.main.validators.user import userSchema
 
 authRoutes = APIRouter(tags=["Auth"])
 
-@authRoutes.post("/")
-async def create_user():
-    """
-    Rota de Teste
-    """
 
-    return JSONResponse(
-        status_code=201, 
-        content={
-            "message": "Você acessou a rota padrão de autenticação",
-            "Authenticate": False
-        }
-        )
+   
+
     
