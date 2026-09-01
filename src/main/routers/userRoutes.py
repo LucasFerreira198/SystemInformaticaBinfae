@@ -1,18 +1,18 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
+from typing import Annotated
 
 
-from src.main.validators.user import userSchema
-from src.main.server.database import getSession
+from src.main.validators.user import userCreateSchema
+from src.main.server.database import Session
 from src.main.models.user import User
-from src.main.core.security import gerateHashPassword
+from src.main.core.security import gerateHashPassword, getCurrentUser, requireAdmin
 
 
-userRoutes = APIRouter(tags=["Users"])
+userRoutes = APIRouter(prefix="/users", tags=["Users"])
 
 @userRoutes.post("/createUser")
-async def createUser(user_schema: userSchema, session: AsyncSession = Depends(getSession)):
+async def createUser(user_schema: userCreateSchema, session: Session):
     # Consulta assíncrona usando select()
     query = select(User).where(User.saram == user_schema.saram)
     result = await session.execute(query)
@@ -46,13 +46,13 @@ async def createUser(user_schema: userSchema, session: AsyncSession = Depends(ge
         "saram": new_user.saram
     }
 
-@userRoutes.get("/listUser")
-async def listUser(session: AsyncSession = Depends(getSession)):
+@userRoutes.get("/listUsers")
+async def listUsers(session: Session, _: Annotated[User, Depends(requireAdmin)]):
     query = select(User)
     result = await session.execute(query)
     users = result.scalars().all()
 
-    return {
+    return [
         {
             "saram": u.saram,
             "first_name": u.first_name,
@@ -61,7 +61,7 @@ async def listUser(session: AsyncSession = Depends(getSession)):
             "admin": u.admin,
         }
         for u in users
-    }
+    ]
 
 
 

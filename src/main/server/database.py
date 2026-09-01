@@ -2,6 +2,9 @@ import os
 from dotenv import load_dotenv
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from sqlalchemy.orm import declarative_base
+from fastapi import Depends
+
+from typing import Annotated
 
 load_dotenv()
 
@@ -30,3 +33,5 @@ Base = declarative_base()
 async def getSession():
     async with AsyncSessionLocal() as session:
         yield session
+
+Session = Annotated[AsyncSession, Depends(getSession)]
