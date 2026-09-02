@@ -18,8 +18,8 @@ from src.main.models.user import User
 load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET_KEY")
-ALGORITH = os.getenv("ALGORITH")
-ACCESS_TOKEN_EXPIRE_MINUTES = os.getenv("ACESS_TOKEN_EXPIRE_MINUTES")
+ALGORITHM = os.getenv("ALGORITH")
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACESS_TOKEN_EXPIRE_MINUTES", 480))
 
 oauth2Scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
@@ -44,11 +44,11 @@ def createAcessToken(data: dict, expires_delta: timedelta | None = None) -> str:
         expires_delta if expires_delta else timedelta(minutes = ACCESS_TOKEN_EXPIRE_MINUTES)
     )
     payload.update({"exp": expire, "iat": datetime.now(timezone.utc)})
-    return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITH)
+    return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
 def decodeAcessToken(token: str) -> dict:
     try:
-        return jwt.decode(token, SECRET_KEY, algorithms=[ALGORITH])
+        return jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
     except jwt.ExpiredSignatureError:
         raise HTTPException(
             status_code = status.HTTP_401_UNAUTHORIZED,
@@ -68,7 +68,7 @@ async def getCurrentUser(
         session: Session,
 ) -> User:
     payload = decodeAcessToken(token)
-    saramStr = str | None = payload.get("sub")
+    saramStr: str | None = payload.get("sub")
 
     if saramStr is None:
         raise HTTPException(
