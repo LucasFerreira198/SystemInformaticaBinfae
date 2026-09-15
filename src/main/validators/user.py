@@ -33,4 +33,12 @@ class UserResponse(BaseModel):
     admin: bool
 
     model_config = {"from_attributes": True}
+
+class UserUpdateSchema(BaseModel):
+    first_name: Optional[str] = Field(default = None, min_length=3)
+    last_name: Optional[str] = Field(default = None, min_length=2)
+    password: Optional[str] = Field(default = None, min_length=6)
+    active: Optional[bool] = Field(default = None)
+    admin: Optional[bool] = Field(default = None)
+    
    

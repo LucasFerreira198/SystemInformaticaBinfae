@@ -2,6 +2,7 @@ import os
 from dotenv import load_dotenv
 from src.main.server.database import Base, DATABASE_URL
 from src.main.models.user import User
+from src.main.models.Military import Military
 
 import asyncio
 from logging.config import fileConfig
